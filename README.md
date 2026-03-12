@@ -16,7 +16,8 @@ Sparse Representation-based Classification (SRC) – For identifying facial expr
 
 Please check ------ folder to download image data first
 
-```ML_HW1_EK/
+```
+ML_HW1_EK/
 │
 ├── angry_face.jpg  # Image for step a
 │         
