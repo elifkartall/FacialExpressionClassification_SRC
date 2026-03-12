@@ -15,7 +15,8 @@ Sparse Representation-based Classification (SRC) – For identifying facial expr
 # Project Structure
 
 ## 📂 Dataset
-Please check [**data folder**]([https://github.com/username/repo/blob/main/data](https://github.com/elifkartall/FacialExpressionClassification_SRC/tree/main/data)) to download image data first.
+
+Please check [**data folder**](https://github.com/elifkartall/FacialExpressionClassification_SRC/tree/main/data) to download image data first.
 
 ```
 ML_HW1_EK/
