@@ -49,4 +49,4 @@ ML_HW1_EK/
 
 ## 📝 Report
 
-You can access the report file [**here**]([https://drive.google.com/drive/folders/1ABehRVdE1_C0H5sOW0qDb7RPd93myDJD?usp=sharing](https://drive.google.com/file/d/1t64UgCQ8wlGi-B6LQl29Yuig06n5RNWq/view?usp=sharing)) via Google Drive.
+You can access the report file [**here**](https://drive.google.com/file/d/1t64UgCQ8wlGi-B6LQl29Yuig06n5RNWq/view?usp=sharing) via Google Drive.
