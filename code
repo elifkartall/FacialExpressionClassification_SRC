@@ -13,27 +13,52 @@ import pywt
 #r = 5, 20, and 30, and investigate the size reduction of the image. In addition, find the Frobenius norm of the resultant matrix at 
 #each truncated case based on r.
 
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+import os
+from scipy.linalg import svd
+
+# ------------------------------------------------
+# IMAGE PATH
+# ------------------------------------------------
 base_path = "/content/drive/MyDrive/Colab Notebooks/ML_HW1_EK"
+img_path = os.path.join(base_path, "angry_face.jpg")
 
-img_path = os.path.join(base_path,"angry_face.jpg")
+# ------------------------------------------------
+# LOAD IMAGE
+# ------------------------------------------------
+image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+image = cv2.resize(image, (48,48))
 
-image = cv2.imread(img_path,cv2.IMREAD_GRAYSCALE)
-image = cv2.resize(image,(48,48))
+m,n = image.shape
 
+plt.figure(figsize=(4,4))
 plt.imshow(image,cmap="gray")
 plt.title("Original Image")
 plt.axis("off")
+plt.show()
 
+# ------------------------------------------------
+# APPLY SVD
+# ------------------------------------------------
 U,S,Vt = svd(image)
 
+# ------------------------------------------------
+# TRUNCATED SVD FUNCTION
+# ------------------------------------------------
 def truncated_svd(U,S,Vt,r):
 
     Ur = U[:,:r]
     Sr = np.diag(S[:r])
     Vr = Vt[:r,:]
 
-    return Ur @ Sr @ Vr
+    reconstructed = Ur @ Sr @ Vr
+    return reconstructed
 
+# ------------------------------------------------
+# R VALUES
+# ------------------------------------------------
 r_values = [5,20,30]
 
 plt.figure(figsize=(12,4))
@@ -42,15 +67,28 @@ for i,r in enumerate(r_values):
 
     recon = truncated_svd(U,S,Vt,r)
 
-    fro = np.linalg.norm(recon,'fro')
+    # Frobenius Norm
+    fro_norm = np.linalg.norm(recon,'fro')
 
-    print("r =",r," Frobenius Norm =",fro)
+    # Size Reduction
+    original_size = m*n
+    compressed_size = r*(m+n+1)
+    compression_ratio = original_size / compressed_size
 
+    print("\n-----------------------------")
+    print("r =",r)
+    print("Frobenius Norm =",fro_norm)
+    print("Original Size =",original_size)
+    print("Compressed Size =",compressed_size)
+    print("Compression Ratio =",compression_ratio)
+
+    # Plot reconstructed image
     plt.subplot(1,3,i+1)
     plt.imshow(recon,cmap="gray")
-    plt.title("r="+str(r))
+    plt.title(f"r = {r}")
     plt.axis("off")
 
+plt.tight_layout()
 plt.show()
 
 
@@ -62,22 +100,38 @@ plt.show()
 #PCA pre-processes the data by mean subtraction and setting the variance to unity before performing the SVD.)
 
 
-b_path = os.path.join(base_path,"Part_B_images")
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+import os
+import random
+from scipy.linalg import svd
 
+# ------------------------------------------------
+# DATA PATH
+# ------------------------------------------------
+base_path = "/content/drive/MyDrive/Colab Notebooks/ML_HW1_EK/Part_B_images"
+
+# iki expression klasörü (örnek)
+classes = ["happy_faces","sad_faces"]
+
+# ------------------------------------------------
+# LOAD RANDOM 10 IMAGES FROM EACH EXPRESSION
+# ------------------------------------------------
 images = []
 
-for folder in os.listdir(b_path):
+for cls in classes:
 
-    folder_path = os.path.join(b_path, folder)
+    folder_path = os.path.join(base_path, cls)
+    files = os.listdir(folder_path)
 
-    if not os.path.isdir(folder_path):
-        continue
+    selected_files = random.sample(files,10)
 
-    for file in os.listdir(folder_path):
+    for file in selected_files:
 
-        file_path = os.path.join(folder_path, file)
+        img_path = os.path.join(folder_path,file)
 
-        img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(img_path,cv2.IMREAD_GRAYSCALE)
 
         if img is None:
             continue
@@ -86,23 +140,44 @@ for folder in os.listdir(b_path):
 
         images.append(img.flatten())
 
+# ------------------------------------------------
+# DATA MATRIX
+# ------------------------------------------------
 X = np.array(images)
 
-print("Dataset shape:",X.shape)
+print("Dataset shape:",X.shape)  # (20,2304)
 
+# ------------------------------------------------
+# MEAN FACE
+# ------------------------------------------------
 mean_face = np.mean(X,axis=0)
 
+plt.figure(figsize=(4,4))
 plt.imshow(mean_face.reshape(48,48),cmap="gray")
 plt.title("Mean Face")
 plt.axis("off")
+plt.show()
 
+# ------------------------------------------------
+# PCA PREPROCESSING
+# Mean subtraction + variance normalization
+# ------------------------------------------------
 X_centered = X - mean_face
 
-U,S,Vt = svd(X_centered,full_matrices=False)
+std = np.std(X_centered,axis=0) + 1e-8
+X_normalized = X_centered / std
+
+# ------------------------------------------------
+# APPLY SVD (PCA)
+# ------------------------------------------------
+U,S,Vt = svd(X_normalized,full_matrices=False)
 
 eigenfaces = Vt
 
-plt.figure(figsize=(10,4))
+# ------------------------------------------------
+# PLOT FIRST 5 EIGENFACES
+# ------------------------------------------------
+plt.figure(figsize=(12,4))
 
 for i in range(5):
 
@@ -113,36 +188,51 @@ for i in range(5):
     plt.title("PC"+str(i+1))
     plt.axis("off")
 
+plt.suptitle("First 5 Eigenfaces")
 plt.show()
 
-test_image = X[0]
+# ------------------------------------------------
+# SELECT TEST IMAGE
+# ------------------------------------------------
+test_img = X[0]
 
-def reconstruct(test,mean,pcs,r):
+# ------------------------------------------------
+# RECONSTRUCTION FUNCTION
+# ------------------------------------------------
+def reconstruct(test,mean,std,pcs,r):
+
+    test_centered = test - mean
+    test_norm = test_centered / std
 
     pcs_r = pcs[:r]
 
-    coeff = (test-mean) @ pcs_r.T
+    coeff = test_norm @ pcs_r.T
 
-    recon = mean + coeff @ pcs_r
+    recon_norm = coeff @ pcs_r
+
+    recon = (recon_norm * std) + mean
 
     return recon.reshape(48,48)
 
+# ------------------------------------------------
+# RECONSTRUCTION FOR DIFFERENT r
+# ------------------------------------------------
 r_values = [5,15,30]
 
 plt.figure(figsize=(12,4))
 
 for i,r in enumerate(r_values):
 
-    rec = reconstruct(test_image,mean_face,eigenfaces,r)
+    rec = reconstruct(test_img,mean_face,std,eigenfaces,r)
 
     plt.subplot(1,3,i+1)
     plt.imshow(rec,cmap="gray")
-    plt.title("r="+str(r))
+    plt.title("Reconstruction r="+str(r))
     plt.axis("off")
 
 plt.show()
 
-#Sparse Representation: Select four distinct facial expressions and 10 images
+#C)Sparse Representation: Select four distinct facial expressions and 10 images
 #per expression, following the sparse representation example (SRC) discussed in class and
 #shown in Figure 3.15 of the textbook. Select three images from each expression to test the
 #sparse representation. Is it possible to identify facial expressions using this representation?
