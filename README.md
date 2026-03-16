@@ -1,4 +1,4 @@
-# FacialExpressionClassification_SRC
+# FacialExpressionClassification
 
 🛠️ Technologies & Libraries I Use
 <p align="left"> <!-- Python en üstte --> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/> </p> <p align="left"> <!-- Grup 1 --> <img src="https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white"/> <img src="https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white"/> <img src="https://img.shields.io/badge/SciPy-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white"/> </p> <p align="left"> <!-- Grup 2 --> <img src="https://img.shields.io/badge/Matplotlib-F37626?style=for-the-badge&logo=matplotlib&logoColor=white"/> <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"/> <img src="https://img.shields.io/badge/PyWavelets-3F3F3F?style=for-the-badge&logo=python&logoColor=white"/> </p>
